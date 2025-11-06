@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Handwritten Document Transcriber (TrOCR)</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 30px;}
+      .container { max-width: 700px; margin: 0 auto; }
+      h1 { color: #444; }
+      .flash { color: red; }
+      .transcription, .correction { margin-top: 15px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Handwritten Document Transcriber</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data">
+            <p>
+                <input type="file" name="file" accept=".png,.jpg,.jpeg" required>
+                <button type="submit">Upload and Transcribe</button>
+            </p>
+        </form>
+        {% if image_url %}
+            <div class="transcription">
+                <img src="{{ image_url }}" width="375">
+                <h3>Transcription:</h3>
+                <form action="{{ url_for('correct') }}" method="POST">
+                    <textarea name="corrected_text" rows="5" style="width:100%;">{{ transcription }}</textarea>
+                    <input type="hidden" name="filename" value="{{ filename }}">
+                    <br>
+                    <button type="submit">Correct & Save</button>
+                </form>
+            </div>
+        {% endif %}
+        <div class="correction">
+            <form action="{{ url_for('retrain') }}" method="POST">
+                <button type="submit">Retrain Model from Corrections</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
